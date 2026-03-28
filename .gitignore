@@ -4,3 +4,9 @@ target/
 *.log
 .idea/
 *.iml
+docs/superpowers/
+.claude/
+CLAUDE.md
+CLAUDE_SESSION_RESUME.md
+AGENTS.md
+GEMINI.md
