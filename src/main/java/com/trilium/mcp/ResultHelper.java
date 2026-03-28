@@ -7,13 +7,13 @@ import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import java.util.List;
 import java.util.Map;
 
-final class ResultHelper {
+public final class ResultHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private ResultHelper() {}
 
-    static CallToolResult sanitizedResult(String content) {
+    public static CallToolResult sanitizedResult(String content) {
         String boundary = ContentSanitizer.generateBoundary();
         String wrapped = ContentSanitizer.wrapContent(content, boundary);
         String securityContext = ContentSanitizer.buildSecurityContext(boundary);
@@ -22,7 +22,7 @@ final class ResultHelper {
                 new McpSchema.TextContent(wrapped)), false);
     }
 
-    static CallToolResult jsonResult(Object data) {
+    public static CallToolResult jsonResult(Object data) {
         try {
             String json = OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(data);
             return new CallToolResult(List.of(new McpSchema.TextContent(json)), false);
@@ -31,11 +31,11 @@ final class ResultHelper {
         }
     }
 
-    static CallToolResult errorResult(String message) {
+    public static CallToolResult errorResult(String message) {
         return new CallToolResult(List.of(new McpSchema.TextContent(message)), true);
     }
 
-    static String getString(Map<String, Object> args, String key) {
+    public static String getString(Map<String, Object> args, String key) {
         Object value = args.get(key);
         if (value == null) {
             throw new IllegalArgumentException("Missing required parameter: " + key);
@@ -43,20 +43,20 @@ final class ResultHelper {
         return String.valueOf(value);
     }
 
-    static int getInt(Map<String, Object> args, String key, int defaultValue) {
+    public static int getInt(Map<String, Object> args, String key, int defaultValue) {
         Object value = args.get(key);
         if (value == null) return defaultValue;
         if (value instanceof Number n) return n.intValue();
         return Integer.parseInt(String.valueOf(value));
     }
 
-    static String getOptionalString(Map<String, Object> args, String key) {
+    public static String getOptionalString(Map<String, Object> args, String key) {
         Object value = args.get(key);
         if (value == null) return null;
         return String.valueOf(value);
     }
 
-    static boolean getBoolean(Map<String, Object> args, String key, boolean defaultValue) {
+    public static boolean getBoolean(Map<String, Object> args, String key, boolean defaultValue) {
         Object value = args.get(key);
         if (value == null) return defaultValue;
         if (value instanceof Boolean b) return b;

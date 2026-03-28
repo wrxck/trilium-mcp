@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-final class TriliumClient {
+public final class TriliumClient {
 
     private static final Logger log = LoggerFactory.getLogger(TriliumClient.class);
 
@@ -31,7 +31,7 @@ final class TriliumClient {
     private final String token;
     private final RateLimiter rateLimiter;
 
-    TriliumClient(String baseUrl, String token, RateLimiter rateLimiter) {
+    public TriliumClient(String baseUrl, String token, RateLimiter rateLimiter) {
         if (baseUrl == null || baseUrl.isBlank()) {
             throw new IllegalArgumentException("baseUrl must not be blank");
         }
@@ -43,23 +43,23 @@ final class TriliumClient {
         this.rateLimiter = rateLimiter;
     }
 
-    String getBaseUrl() {
+    public String getBaseUrl() {
         return baseUrl;
     }
 
     // --- notes ---
 
-    Map<String, Object> getNote(String noteId) {
+    public Map<String, Object> getNote(String noteId) {
         validateNoteId(noteId);
         return getJson("/etapi/notes/" + noteId);
     }
 
-    String getNoteContent(String noteId) {
+    public String getNoteContent(String noteId) {
         validateNoteId(noteId);
         return getString("/etapi/notes/" + noteId + "/content");
     }
 
-    Map<String, Object> createNote(String parentNoteId, String title, String type, String content) {
+    public Map<String, Object> createNote(String parentNoteId, String title, String type, String content) {
         var body = Map.of(
                 "parentNoteId", parentNoteId,
                 "title", title,
@@ -69,22 +69,22 @@ final class TriliumClient {
         return postJson("/etapi/create-note", body);
     }
 
-    Map<String, Object> updateNote(String noteId, Map<String, Object> updates) {
+    public Map<String, Object> updateNote(String noteId, Map<String, Object> updates) {
         validateNoteId(noteId);
         return patchJson("/etapi/notes/" + noteId, updates);
     }
 
-    void setNoteContent(String noteId, String content) {
+    public void setNoteContent(String noteId, String content) {
         validateNoteId(noteId);
         putString("/etapi/notes/" + noteId + "/content", content);
     }
 
-    void deleteNote(String noteId) {
+    public void deleteNote(String noteId) {
         validateNoteId(noteId);
         delete("/etapi/notes/" + noteId);
     }
 
-    byte[] exportNote(String noteId, String format) {
+    public byte[] exportNote(String noteId, String format) {
         validateNoteId(noteId);
         return getBytes("/etapi/notes/" + noteId + "/export?format=" + encode(format));
     }
@@ -92,7 +92,7 @@ final class TriliumClient {
     // --- attributes ---
 
     @SuppressWarnings("unchecked")
-    List<Map<String, Object>> getAttributes(String noteId) {
+    public List<Map<String, Object>> getAttributes(String noteId) {
         validateNoteId(noteId);
         Map<String, Object> resp = getJson("/etapi/notes/" + noteId + "/attributes");
         Object attrs = resp.get("attributes");
@@ -102,25 +102,25 @@ final class TriliumClient {
         return List.of();
     }
 
-    Map<String, Object> createAttribute(Map<String, Object> attr) {
+    public Map<String, Object> createAttribute(Map<String, Object> attr) {
         return postJson("/etapi/attributes", attr);
     }
 
-    Map<String, Object> updateAttribute(String attributeId, Map<String, Object> updates) {
+    public Map<String, Object> updateAttribute(String attributeId, Map<String, Object> updates) {
         return patchJson("/etapi/attributes/" + encode(attributeId), updates);
     }
 
-    void deleteAttribute(String attributeId) {
+    public void deleteAttribute(String attributeId) {
         delete("/etapi/attributes/" + encode(attributeId));
     }
 
     // --- search ---
 
     @SuppressWarnings("unchecked")
-    List<Map<String, Object>> searchNotes(String query, int limit, String orderBy) {
+    public List<Map<String, Object>> searchNotes(String query, int limit, String orderBy) {
         String path = "/etapi/notes?search=" + encode(query)
                 + "&limit=" + limit
-                + "&orderBy=" + encode(orderBy);
+                + (orderBy != null ? "&orderBy=" + encode(orderBy) : "");
         Map<String, Object> resp = getJson(path);
         Object results = resp.get("results");
         if (results instanceof List<?> list) {
@@ -131,29 +131,29 @@ final class TriliumClient {
 
     // --- branches ---
 
-    Map<String, Object> createBranch(Map<String, Object> branch) {
+    public Map<String, Object> createBranch(Map<String, Object> branch) {
         return postJson("/etapi/branches", branch);
     }
 
-    Map<String, Object> updateBranch(String branchId, Map<String, Object> updates) {
+    public Map<String, Object> updateBranch(String branchId, Map<String, Object> updates) {
         return patchJson("/etapi/branches/" + encode(branchId), updates);
     }
 
-    void deleteBranch(String branchId) {
+    public void deleteBranch(String branchId) {
         delete("/etapi/branches/" + encode(branchId));
     }
 
     // --- system ---
 
-    Map<String, Object> getAppInfo() {
+    public Map<String, Object> getAppInfo() {
         return getJson("/etapi/app-info");
     }
 
-    void triggerBackup(String name) {
+    public void triggerBackup(String name) {
         put("/etapi/backup/" + encode(name));
     }
 
-    Map<String, Object> getDayNote(String date) {
+    public Map<String, Object> getDayNote(String date) {
         return getJson("/etapi/calendar/days/" + encode(date));
     }
 
@@ -329,15 +329,15 @@ final class TriliumClient {
 
     // --- exception ---
 
-    static final class TriliumApiException extends RuntimeException {
+    public static final class TriliumApiException extends RuntimeException {
         private final int statusCode;
 
-        TriliumApiException(int statusCode, String message) {
+        public TriliumApiException(int statusCode, String message) {
             super(message);
             this.statusCode = statusCode;
         }
 
-        int getStatusCode() {
+        public int getStatusCode() {
             return statusCode;
         }
     }
