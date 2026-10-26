@@ -23,7 +23,9 @@ public final class TriliumClient {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Pattern NOTE_ID_PATTERN = Pattern.compile("[a-zA-Z0-9_]{1,50}");
+    // trilium behind docker-proxy answers 400 to the h2c upgrade that http/2 sends
     private static final HttpClient HTTP = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_1_1)
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
