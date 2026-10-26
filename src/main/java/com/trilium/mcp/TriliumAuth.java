@@ -122,7 +122,7 @@ final class TriliumAuth {
 
     private static void validateConnection(String url, String token) {
         try {
-            var client = HttpClient.newHttpClient();
+            var client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
             var request = HttpRequest.newBuilder()
                     .uri(URI.create(url + "/etapi/app-info"))
                     .header("Authorization", token)
