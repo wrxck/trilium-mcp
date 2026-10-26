@@ -12,6 +12,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Map;
 import java.util.Properties;
 
 final class TriliumAuth {
@@ -39,6 +40,16 @@ final class TriliumAuth {
     }
 
     static Config getConfig(Path configFile) {
+        return getConfig(configFile, System.getenv());
+    }
+
+    // env first, so a wrapper or a systemd service needs no config file in each home
+    static Config getConfig(Path configFile, Map<String, String> env) {
+        String envUrl = env.get("TRILIUM_URL");
+        String envToken = env.getOrDefault("TRILIUM_TOKEN", env.get("TRILIUM_ETAPI_TOKEN"));
+        if (envUrl != null && !envUrl.isBlank() && envToken != null && !envToken.isBlank()) {
+            return new Config(envUrl.trim(), envToken.trim());
+        }
         if (!Files.exists(configFile)) {
             throw new IllegalStateException(
                     "Config not found at " + configFile + ". Run with --init to set up.");
